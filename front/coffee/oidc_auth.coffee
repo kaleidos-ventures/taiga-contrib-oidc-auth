@@ -67,15 +67,22 @@ OIDCLoginButtonDirective = ($window, $params, $location, $config, $events, $conf
         $el.on "click", ".button-auth", (event) ->
             if $params.next and $params.next != $navUrls.resolve("login")
                 nextUrl = $params.next
+                console.log("next params", $params.next, " - ", nextUrl)
             else
                 nextUrl = $navUrls.resolve("home")
+                console.log("next home", nextUrl)
+
             base_url = $config.get("api", "/api/v1/").split('/').slice(0, -3).join("/")
+            console.log("config: ", $config)
+            console.log("base_url: ", base_url)
+
             url = urljoin(
                 base_url,
                 $config.get("oidcMountPoint", "/oidc"),
                 "authenticate/"
             )
             url += "?next=" + nextUrl
+            console.log("al final, url", url)
             $window.location.href = url
 
         $scope.$on "$destroy", ->
