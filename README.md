@@ -112,11 +112,13 @@ Build the frontend plugin:
 If you already have Gulp on your system, you may just call `gulp build` instead
 of the last two lines.
 
-Copy the OIDC compiled code to the taiga-front directory:
+Download in your `dist/plugins/` directory of Taiga front the `taiga-oidc-auth`compiled code (you need subversion in your system):
 
 ```bash
-  mkdir -p $TAIGA_FRONT/dist/plugins/
-  cp -r dist/ $TAIGA_FRONT/dist/plugins/oidc-auth/
+  cd $TAIGA_FRONT/dist/
+  mkdir -p plugins
+  cd plugins
+  svn export "https://github.com/kaleidos-ventures/taiga-oidc-auth/tags/stable/front/dist" "oidc-auth"
 ```
 
 Include in your `$TAIGA_FRONT/dist/conf.json` in the `contribPlugins` list the
@@ -124,7 +126,7 @@ value `"/plugins/oidc-auth/oidc-auth.json"`:
 
 ```json
 ...
-    "contribPlugins": ["/plugins/oidc-auth/oidc-auth.json"],
+    "contribPlugins": ["plugins/oidc-auth/oidc-auth.json"],
 ...
 ```
 
@@ -137,12 +139,12 @@ example, if you are using Fedora's OIDC provider, you may set:
 ```json
 ...
     "oidcButtonText": "Fedora",
-    "oidcButtonImage": "fedora-logo.png",
+    "oidcButtonImage": "oidc-logo.gif",
 ...
 ```
 
 If you set a different logo, you must copy the file in
-`$TAIGA_FRONT/dist/plugins/oidc-auth/images/contrib/`.
+`$TAIGA_FRONT/dist/plugins/oidc-auth/images/`.
 
 If you want to mount the `mozilla_django_oidc` app on a different location in
 taiga-back, you can change the moint point in `$TAIGA_BACK/settings/urls.py`

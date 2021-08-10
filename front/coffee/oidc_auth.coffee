@@ -83,7 +83,7 @@ OIDCLoginButtonDirective = ($window, $params, $location, $config, $events, $conf
 
         # Template context
         $scope.buttonText = $config.get("oidcButtonText", "OpenID Connect")
-        $scope.buttonImage = $config.get("oidcButtonImage", "logo.gif")
+        $scope.buttonImage = $config.get("oidcButtonImage", "oidc-logo.gif")
 
     return {
         link: link
