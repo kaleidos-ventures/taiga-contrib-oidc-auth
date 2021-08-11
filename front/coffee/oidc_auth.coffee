@@ -65,6 +65,8 @@ OIDCLoginButtonDirective = ($window, $params, $location, $config, $events, $conf
         loginWithOIDCAccount()
 
         $el.on "click", ".button-auth", (event) ->
+            console.log("WHOT")
+
             if $params.next and $params.next != $navUrls.resolve("login")
                 nextUrl = $params.next
                 console.log("next params", $params.next, " - ", nextUrl)
