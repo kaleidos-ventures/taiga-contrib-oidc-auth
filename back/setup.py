@@ -16,7 +16,7 @@ setup(
     include_package_data=True,
     packages=find_packages(),
     install_requires=[
-        "django",
+        "django > 2, < 3",
         "mozilla-django-oidc",
         "six",
     ],
