@@ -1,6 +1,6 @@
 module = angular.module('taigaContrib.oidcAuth', [])
 
-OIDCLoginButtonDirective = ($window, $params, $location, $config, $events, $confirm, $auth, $navUrls, $loader, $rootScope) ->
+OIDCLoginButtonDirective = ($window, $params, $location, $config, $events, $confirm, $auth, $navUrls, $loader, $rootScope, $tgHttp) ->
     # Login or register a user with their OIDC account.
 
     link = ($scope, $el, $attrs) ->
@@ -65,18 +65,21 @@ OIDCLoginButtonDirective = ($window, $params, $location, $config, $events, $conf
         loginWithOIDCAccount()
 
         $el.on "click", ".button-auth", (event) ->
-            if $params.next and $params.next != $navUrls.resolve("login")
-                nextUrl = $params.next
-            else
-                nextUrl = $navUrls.resolve("home")
-            base_url = $config.get("api", "/api/v1/").split('/').slice(0, -3).join("/")
-            url = urljoin(
-                base_url,
-                $config.get("oidcMountPoint", "/oidc"),
-                "authenticate/"
-            )
-            url += "?next=" + nextUrl
-            $window.location.href = url
+            $tgHttp.post("/oidc/logout/").then (r) ->
+                if $params.next and $params.next != $navUrls.resolve("login")
+                    nextUrl = $params.next
+                else
+                    nextUrl = $navUrls.resolve("home")
+                base_url = $config.get("api", "/api/v1/").split('/').slice(0, -3).join("/")
+                url = urljoin(
+                    base_url,
+                    $config.get("oidcMountPoint", "/oidc"),
+                    "authenticate/"
+                )
+                url += "?next=" + nextUrl
+                $window.location.href = url
+            .catch (e) ->
+                console.error("failed logging out: #{ e }")
 
         $scope.$on "$destroy", ->
             $el.off()
@@ -93,5 +96,5 @@ OIDCLoginButtonDirective = ($window, $params, $location, $config, $events, $conf
 
 module.directive("tgOidcLoginButton", [
    "$window", '$routeParams', "$tgLocation", "$tgConfig", "$tgEvents",
-   "$tgConfirm", "$tgAuth", "$tgNavUrls", "tgLoader", "$rootScope",
+   "$tgConfirm", "$tgAuth", "$tgNavUrls", "tgLoader", "$rootScope", "$tgHttp",
    OIDCLoginButtonDirective])
