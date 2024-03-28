@@ -37,7 +37,7 @@ OIDCLoginButtonDirective = ($window, $params, $location, $config, $events, $conf
             else
                 nextUrl = $navUrls.resolve("home")
 
-            $location.path(nextUrl)
+            $window.location.href = nextUrl
 
         loginError = ->
             error_description = $params.error_description
