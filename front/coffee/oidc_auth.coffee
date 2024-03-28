@@ -11,6 +11,7 @@ OIDCLoginButtonDirective = ($window, $params, $location, $config, $events, $conf
             data = _.clone($params, false);
             user = $auth.model.make_model("users", data);
             $auth.setToken(user.auth_token);
+            $auth.setRefreshToken(user.refresh)
             $auth.setUser(user);
             $rootScope.$broadcast("auth:login", user)
 
