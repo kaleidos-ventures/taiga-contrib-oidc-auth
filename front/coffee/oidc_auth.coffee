@@ -1,42 +1,28 @@
 module = angular.module('taigaContrib.oidcAuth', [])
 
-OIDCLoginButtonDirective = ($window, $params, $location, $config, $events, $confirm, $auth, $navUrls, $loader, $rootScope) ->
+OIDCLoginButtonDirective = ($window, $params, $location, $config, $events, $confirm, $auth, $navUrls, $rootScope) ->
     # Login or register a user with their OIDC account.
 
     link = ($scope, $el, $attrs) ->
 
         loginSuccess = ->
-            # Login in the UI. Using $auth.login() is too GitHub-specific.
-            $auth.removeToken();
-            data = _.clone($params, false);
-            user = $auth.model.make_model("users", data);
-            $auth.setToken(user.auth_token);
-            $auth.setUser(user);
-            $rootScope.$broadcast("auth:login", user)
-
-            # Cleanup the URL
-
-            $events.setupConnection()  # I don't know why this is necessary.
-
-            scrub = (name, i) ->
-                $location.search(name, null)
-             [
-                'accepted_terms', 'auth_token', 'big_photo', 'bio', 'color', 'date_joined',
-                'email', 'full_name', 'full_name_display', 'gravatar_id', 'id', 'is_active',
-                'lang', 'max_memberships_private_projects', 'max_memberships_public_projects',
-                'max_private_projects', 'max_public_projects', 'next', 'photo', 'read_new_terms',
-                'roles', 'theme', 'timezone', 'total_private_projects', 'total_public_projects',
-                'type', 'username', 'uuid'
-            ].forEach(scrub)
-
-            # Redirect to the destination page.
-
             if $params.next and $params.next != $navUrls.resolve("login")
                 nextUrl = $params.next
             else
                 nextUrl = $navUrls.resolve("home")
 
-            $location.path(nextUrl)
+            $events.setupConnection()
+
+            $auth.removeToken();
+            data = JSON.parse($params.data);
+
+            user = $auth.model.make_model("users", data);
+            $auth.setToken(user.auth_token);
+            $auth.setRefreshToken(user.refresh)
+            $auth.setUser(user);
+            $rootScope.$broadcast("auth:login", user)
+
+            $window.location.href = nextUrl
 
         loginError = ->
             error_description = $params.error_description
@@ -93,5 +79,5 @@ OIDCLoginButtonDirective = ($window, $params, $location, $config, $events, $conf
 
 module.directive("tgOidcLoginButton", [
    "$window", '$routeParams', "$tgLocation", "$tgConfig", "$tgEvents",
-   "$tgConfirm", "$tgAuth", "$tgNavUrls", "tgLoader", "$rootScope",
+   "$tgConfirm", "$tgAuth", "$tgNavUrls", "$rootScope",
    OIDCLoginButtonDirective])
