@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from json import dumps
 from six.moves.urllib.parse import urlencode
 
 from mozilla_django_oidc.views import OIDCAuthenticationCallbackView
@@ -28,20 +29,26 @@ def _make_login_url(data):
             "front": {"domain": "localhost:9001", "scheme": "http", "name": "front"},
         },
     )
+
     return "{}://{}/login?{}".format(
         SITES["front"]["scheme"], SITES["front"]["domain"], urlencode(data)
     )
 
 
 class TaigaOIDCAuthenticationCallbackView(OIDCAuthenticationCallbackView):
+
     @property
     def success_url(self):
-        # Pull the next url from the session or settings--we don't need to
-        # sanitize here because it should already have been sanitized.
-        next_url = self.request.session.get("oidc_login_next") or "/"
-        data = make_auth_response_data(self.user)
-        data["type"] = "oidc"
-        data["next"] = next_url
+        user_data = make_auth_response_data(self.user)
+        user_data["roles"] = list(user_data["roles"])
+        user_data["date_joined"] = str(user_data["date_joined"])
+
+        data = {
+            "type": "oidc",
+            "data": dumps(user_data),
+            "next": self.request.session.get("oidc_login_next") or "/",
+        }
+
         return _make_login_url(data)
 
     @property
@@ -52,4 +59,5 @@ class TaigaOIDCAuthenticationCallbackView(OIDCAuthenticationCallbackView):
             "error": self.request.GET.get("error"),
             "error_description": self.request.GET.get("error_description"),
         }
+
         return _make_login_url(data)
